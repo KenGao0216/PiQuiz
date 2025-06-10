@@ -1,4 +1,5 @@
 import React from 'react';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 function Header({
   start,
@@ -14,7 +15,8 @@ function Header({
 }) {
   const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
   const seconds = String(timeLeft % 60).padStart(2, '0');
-
+  const {listening, browserSupportsSpeechRecognition} = useSpeechRecognition();
+  
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
       <div style={{ display: 'flex', gap: '10px' }}>
@@ -49,7 +51,7 @@ function Header({
         justifyContent: 'space-between',
         alignItems: 'center',
         }}>
-            <div style={{ marginLeft: '2em' }}>
+          <div style={{ marginLeft: '2em' }}>
             <button
             onClick={onStart}
             disabled={quizStarted && !quizEnded}
@@ -73,12 +75,36 @@ function Header({
             >
             Reset
             </button>
-            </div>
+          </div>
             <div style={{ marginRight: '2em' }}>
-            <span style={{ marginLeft: '1em', fontWeight: 'bold', fontSize: '2em' }}>
-            {quizStarted ? `${minutes}:${seconds}` : '15:00'}
-            </span>
-            </div>
+              <div style={{ marginLeft: '1.5em', display: 'flex', alignItems: 'center' }}>
+              {browserSupportsSpeechRecognition ? (
+                <>
+                  <button
+                    onClick={() => SpeechRecognition.startListening({ continuous: true, language: 'en-US' })}
+                    disabled={disabled}
+                    style={{ marginRight: '10px' }}
+                  >
+                    🎤 Start Voice
+                  </button>
+                  <button
+                    onClick={SpeechRecognition.stopListening}
+                    disabled={disabled}
+                  >
+                    🛑 Stop Voice
+                  </button>
+                  <span style={{ marginLeft: '1em', color: listening ? 'green' : 'gray' }}>
+                    {listening ? 'Listening...' : 'Not listening'}
+                  </span>
+                </>
+              ) : (
+                <span>Your browser does not support speech recognition.</span>
+              )}
+              <span style={{ marginLeft: '1em', fontWeight: 'bold', fontSize: '2em' }}>
+                {quizStarted ? `${minutes}:${seconds}` : '15:00'}
+                </span>
+            </div>  
+          </div>
       </div>
     </div>
   );

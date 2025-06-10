@@ -4,6 +4,7 @@ import './App.css'
 import Header from './components/Header'
 import QuizBody from './components/QuizBody'
 import confetti from 'canvas-confetti'
+import { ENCOURAGEMENTS } from './data'
 
 function App() {
   const [start, setStart] = useState(1);
@@ -14,8 +15,14 @@ function App() {
   const [reset, setReset] = useState(0);
   const [win, setWin] = useState(false);
   const [lose, setLose] = useState(false);
+  const [encourageMsg, setEncourageMsg] = useState('');
   const timerRef = useRef(null);
 
+   const handleEncourage = () => {
+    const msg = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)];
+    setEncourageMsg(`${msg}`);
+    setTimeout(() => setEncourageMsg(''), 1000);
+  };
   useEffect(() => {
     if (quizStarted && !quizEnded) {
       timerRef.current = setInterval(() => {
@@ -79,7 +86,14 @@ function App() {
   return (
     <>
       <h1>Digits of Pi Quiz</h1>
-      <h3>Practice memorizing any sequence of digits</h3>
+      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1em'}}>
+        <h3 style={{margin: 0}}>Practice memorizing any sequence of digits</h3>
+        {encourageMsg && (
+          <span style={{marginLeft: '1em', color: '#2e8b57', fontWeight: 'bold', fontSize: '1.5em'}}>
+            {encourageMsg}
+          </span>
+        )}
+      </div>
       {win && (
         <div style={{
           position: 'fixed',
@@ -129,6 +143,7 @@ function App() {
       disabled={!quizStarted || quizEnded} 
       reset={reset}
       onWin={handleWin}
+      onEncourage={handleEncourage}
       />
     </>
   )
